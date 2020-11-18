@@ -1,0 +1,56 @@
+apply plugin: 'java'
+apply plugin: 'idea'
+
+group = 'org.azatsh.sshpasschange'
+version = "${version}"
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    lombokVersion = '1.18.8'
+}
+
+dependencies {
+    compile("net.sf.expectit:expectit-core:0.9.0")
+    compile("com.jcraft:jsch:0.1.55")
+    compile("com.hierynomus:sshj:0.30.0")
+
+    compileOnly("org.projectlombok:lombok:${lombokVersion}")
+    annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
+
+    compile("org.slf4j:slf4j-api:1.7.30")
+    compile("org.apache.logging.log4j:log4j-slf4j-impl:2.13.3")
+
+    testCompile("org.projectlombok:lombok:${lombokVersion}")
+    testAnnotationProcessor("org.projectlombok:lombok:${lombokVersion}")
+}
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'org.azatsh.sshpasschange.Main'
+        )
+    }
+}
+
+clean {
+    delete "${projectDir}/package"
+}
+
+build {
+    doLast {
+        copy {
+            from jar // application itself
+            from configurations.runtime // dependencies
+            into "${projectDir}/package/libs"
+        }
+        copy {
+            from "${projectDir}/src/main/files"
+            into "${projectDir}/package"
+        }
+    }
+}
+
